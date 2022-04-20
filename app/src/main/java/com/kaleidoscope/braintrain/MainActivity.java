@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private int answer;
     private int rightButtonNum;
     private CountDownTimer timer;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,16 @@ public class MainActivity extends AppCompatActivity {
         button_3 = findViewById(R.id.button_3);
 
         generateQuestion();
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        if (!prefs.contains("win")) {
+            prefs.edit().putInt("win", 0).apply();
+            prefs.edit().putInt("all", 0).apply();
+        }
+
+        textViewScore.setText(Integer.toString(prefs.getInt("win", 0)) + "/" +
+                Integer.toString(prefs.getInt("all", 0)));
 
 
         timer = new CountDownTimer(15000, 1000) {
@@ -55,6 +66,12 @@ public class MainActivity extends AppCompatActivity {
             public void onFinish() {
                 Toast.makeText(MainActivity.this, R.string.time_end_toast, Toast.LENGTH_SHORT).show();
                 textViewTimer.setText(Integer.toString(0));
+                prefs.edit().putInt("all", (prefs.getInt("all", 0) + 1)).apply();
+                textViewScore.setText(Integer.toString(prefs.getInt("win", 0)) + "/" +
+                        Integer.toString(prefs.getInt("all", 0)));
+                textViewTimer.setTextColor(getResources().getColor(R.color.black));
+                timer.start();
+                generateQuestion();
             }
         };
         timer.start();
@@ -104,21 +121,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // generate wrongs
-
+        int wrong = -1;
         for (int i = 0; i < 4; ++i) {
             if (i == rightButtonNum) continue;
+            wrong = answer - (int)(Math.random() * 10);
+            while (wrong == answer)
+                wrong = answer - (int)(Math.random() * 10);
             switch (i) {
                 case 0:
-                    button_0.setText(Integer.toString((int)(Math.random() * 1000)));
+                    button_0.setText(Integer.toString(wrong));
                     break;
                 case 1:
-                    button_1.setText(Integer.toString((int)(Math.random() * 1000)));
+                    button_1.setText(Integer.toString(wrong));
                     break;
                 case 2:
-                    button_2.setText(Integer.toString((int)(Math.random() * 1000)));
+                    button_2.setText(Integer.toString(wrong));
                     break;
                 case 3:
-                    button_3.setText(Integer.toString((int)(Math.random() * 1000)));
+                    button_3.setText(Integer.toString(wrong));
                     break;
             }
         }
@@ -128,9 +148,16 @@ public class MainActivity extends AppCompatActivity {
     public void onClickAnswer(View view) {
         Button clickedButton = (Button) view;
         if (Integer.parseInt(clickedButton.getTag().toString()) == rightButtonNum) {
+            prefs.edit().putInt("win", (prefs.getInt("win", 0) + 1)).apply();
+            prefs.edit().putInt("all", (prefs.getInt("all", 0) + 1)).apply();
+            textViewScore.setText(Integer.toString(prefs.getInt("win", 0)) + "/" +
+                    Integer.toString(prefs.getInt("all", 0)));
             Toast.makeText(MainActivity.this, "RIGHT!", Toast.LENGTH_SHORT).show();
         }
         else {
+            prefs.edit().putInt("all", (prefs.getInt("all", 0) + 1)).apply();
+            textViewScore.setText(Integer.toString(prefs.getInt("win", 0)) + "/" +
+                    Integer.toString(prefs.getInt("all", 0)));
             Toast.makeText(MainActivity.this, "WRONG!", Toast.LENGTH_SHORT).show();
         }
 
