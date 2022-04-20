@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Brain Train</string>
     <string name="time_end_toast">Время вышло!</string>
+    <string name="subtr_quest">%s - %s = ?</string>
+    <string name="add_quest">%s + %s = ?</string>
+    <string name="multiply_quest">%s * %s = ?</string>
+    <string name="divide_quest">%s / %s = ?</string>
 </resources>
